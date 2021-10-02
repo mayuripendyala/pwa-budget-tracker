@@ -22,10 +22,9 @@ This application takes advantage of the following technologies:
 
 ## Instructions
 
-This project is deployed on Heroku [here](https://mp-pwa-budget-tracker/).
+This project is deployed on Heroku [here](https://mp-pwa-budget-tracker.herokuapp.com/)
 
 ## Page Screenshots
 
 Installed app on MacOS:
-![ReadMe_ScreenShot_MacOS](./public/assets/images/pwa)
-Installed app on iOS:
+![ReadMe_ScreenShot_MacOS](./public/assets/images/pwa.png)
