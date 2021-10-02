@@ -1,19 +1,8 @@
-//register service worker
-
-if("serviceworker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/service-worker.js")
-    .then((reg)=>{
-      console.log("service worker registered", reg);
-    });
-  });
-}
-
 
 let transactions = [];
 let myChart;
 
-fetch("/api/transaction")
+fetch("/api/transaction/")
   .then(response => {
     return response.json();
   })
@@ -148,6 +137,7 @@ function sendTransaction(isAdding) {
   })
   .catch(err => {
     // fetch failed, so save in indexed db
+    console.log(transaction);
     saveRecord(transaction);
 
     // clear form

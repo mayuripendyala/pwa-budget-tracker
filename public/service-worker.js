@@ -2,65 +2,62 @@ const FILES_TO_CACHE = [
     "/",
     "/index.html",
     "/index.js",
+    "/indexDB.js",
     "/assets/icons/icon-192x192.png",
     "/assets/icons/icon-512x512.png",
     "/manifest.webmanifest",
     "/styles.css",
-]
+    "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
+    "https://cdn.jsdelivr.net/npm/chart.js@2.8.0"
+    
+];
 
 const CACHE_NAME ="static-cache-v2";
 const DATA_CACHE_NAME = "data-cache-v1";
 
 self.addEventListener("install", function(event) {
+    console.log("used to register the service worker");
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-            console.log("your files were pre-cached successfully");
-            return cache.addAll(FILES_TO_CACHE);
-        })
-    )
+        caches
+          .open(CACHE_NAME)
+          .then((cache) => {
+              return cache.addAll(FILES_TO_CACHE)
+            })
+          .then(self.skipWaiting())
+      )
 });
 
-
-self.addEventListener("activate", (event) =>{
-    event.waitUntil(
-        caches.keys().then(keyList => {
-            return Promise.all(
-                keyList.map(key =>{
-                    if(key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
-                        console.log("Removing old cache data", key);
-                        return caches.delete(key);
-                    }
-                })
-            )
-        })
-    )
-        self.clients.claim();
-});
 
 self.addEventListener("fetch", (event) => {
-    if(event.request.url.include("/api/")) {
-        event.respondWith(
-            caches.open(DATA_CACHE_NAME).then(cache => {
-                return fetch(event.request)
-                        .then(response => {
-                            //If Reposne was good, clone it and store it in the cache.
-                            if(response.status === 200){
-                                cache.put(event.request.url,response.clone());
-                            }
-                            return response;
-                        })
-                        .catch(error =>{
-                            //Network request failed, try to get it from the cache.
-                            return cache.match(event.request);
-                        });
-            }).catch(err=> console/log(err))
-        );
-        return;
-    }
+    console.log('used to intercept requests so we can check for the file or data in the cache');
+    
 
     event.respondWith(
-        caches.match(event.request).then((response)=>{
-            return response || fetch(event.request);
+        fetch(event.request)
+        .catch(() => {
+            return caches.open(CACHE_NAME)
+                .then((cache) => {
+                    return cache.match(event.request)
+                })
         })
     );
-});
+}); 
+
+
+
+self.addEventListener('activate', (event)=>{
+    console.log('this event triggers  when the service worker is activates');
+    event.waitUntil(
+        caches.keys()
+            .then((keyList) => {
+                return Promise.all(keyList.map((key) => {
+                    if(key !== CACHE_NAME) {
+                        console.log('[service worker] removing old cache',key);
+                        return caches.delete(key);
+                    }
+                }))
+            })
+            .then(() => self.clients.claim())
+    )
+
+})
