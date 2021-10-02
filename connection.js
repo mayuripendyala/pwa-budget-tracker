@@ -1,7 +1,7 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-const url =   'mongodb://localhost/budget' || process.env.MONGODB_URI ;
+const url =  process.env.MONGODB_URI  || 'mongodb://localhost/budget' ;
   // process.env.MONGODB_URI ||
 
 const db = mongoose.connection;
